@@ -3,364 +3,198 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>NeoBot Panel - Tu Servidor con IA</title>
+  <title>NeoBot Studio - Panel Avanzado</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
   <style>
-    body { font-family: 'Segoe UI', system-ui, sans-serif; }
-    .chat-bubble { max-width: 75%; }
-    .terminal { font-family: 'Courier New', monospace; }
+    body { font-family: 'Segoe UI', sans-serif; }
+    .section { display: none; }
+    .active { background-color: rgb(55 65 81); color: white; }
   </style>
 </head>
-<body class="bg-gray-950 text-gray-100">
+<body class="bg-gray-950 text-gray-100 min-h-screen">
 
-  <div class="flex h-screen">
+  <!-- Login con Discord -->
+  <div id="loginScreen" class="fixed inset-0 bg-black/95 flex items-center justify-center z-50">
+    <div class="text-center max-w-md">
+      <div class="mb-10">
+        <div class="w-24 h-24 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-3xl mx-auto flex items-center justify-center text-6xl mb-6">
+          🤖
+        </div>
+        <h1 class="text-5xl font-bold">NeoBot Studio</h1>
+        <p class="text-gray-400 mt-2">Control total de tu bot</p>
+      </div>
+
+      <button onclick="fakeDiscordLogin()" 
+              class="w-full bg-[#5865F2] hover:bg-[#4752C4] transition-colors text-white py-5 rounded-3xl text-lg font-semibold flex items-center justify-center gap-4 shadow-xl">
+        <i class="fab fa-discord text-2xl"></i>
+        Iniciar sesión con Discord
+      </button>
+
+      <p class="text-xs text-gray-500 mt-8">
+        Solo usuarios autorizados podrán acceder al panel
+      </p>
+    </div>
+  </div>
+
+  <!-- Aplicación Principal -->
+  <div id="mainApp" class="hidden flex h-screen">
+
     <!-- Sidebar -->
-    <div class="w-72 bg-black border-r border-gray-800 flex flex-col">
-      <div class="p-6 border-b border-gray-800">
-        <div class="flex items-center gap-3">
-          <div class="w-10 h-10 bg-gradient-to-br from-purple-600 to-blue-600 rounded-2xl flex items-center justify-center text-2xl">🤖</div>
-          <div>
-            <h1 class="text-2xl font-bold">NeoBot</h1>
-            <p class="text-xs text-emerald-400">● Online</p>
-          </div>
+    <div class="w-80 bg-black border-r border-gray-800 flex flex-col">
+      <div class="p-6 border-b border-gray-800 flex items-center gap-3">
+        <div class="w-10 h-10 bg-indigo-600 rounded-2xl flex items-center justify-center text-2xl">🧠</div>
+        <div>
+          <h1 class="text-2xl font-bold">NeoBot Studio</h1>
+          <p class="text-emerald-400 text-sm">● Conectado</p>
         </div>
       </div>
 
-      <div class="p-4">
-        <input id="botToken" type="password" placeholder="Token del Bot de Discord" 
-               class="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-purple-500">
-        <button onclick="connectBot()" 
-                class="mt-3 w-full bg-purple-600 hover:bg-purple-700 py-3 rounded-xl font-medium flex items-center justify-center gap-2">
-          <i class="fas fa-plug"></i> Conectar Bot
-        </button>
-      </div>
-
-      <nav class="flex-1 px-3 py-6 space-y-1 overflow-y-auto">
-        <a href="#" onclick="showSection('dashboard')" class="nav-item flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-900 text-gray-400 hover:text-white active">
-          <i class="fas fa-home w-5"></i> Dashboard
+      <nav class="flex-1 p-4 space-y-1">
+        <a onclick="showSection('ia-engine')" class="nav-item flex items-center gap-3 px-5 py-4 rounded-2xl cursor-pointer hover:bg-gray-900">
+          <i class="fas fa-brain"></i> IA Engine
         </a>
-        <a href="#" onclick="showSection('ai-chat')" class="nav-item flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-900 text-gray-400 hover:text-white">
-          <i class="fas fa-comments w-5"></i> Chat IA
+        <a onclick="showSection('personality')" class="nav-item flex items-center gap-3 px-5 py-4 rounded-2xl cursor-pointer hover:bg-gray-900">
+          <i class="fas fa-user-edit"></i> Personalidad
         </a>
-        <a href="#" onclick="showSection('voice-chat')" class="nav-item flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-900 text-gray-400 hover:text-white">
-          <i class="fas fa-microphone w-5"></i> Chat de Voz IA
+        <a onclick="showSection('commands')" class="nav-item flex items-center gap-3 px-5 py-4 rounded-2xl cursor-pointer hover:bg-gray-900">
+          <i class="fas fa-magic"></i> Creador de Comandos
         </a>
-        <a href="#" onclick="showSection('tickets')" class="nav-item flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-900 text-gray-400 hover:text-white">
-          <i class="fas fa-ticket-alt w-5"></i> Panel de Tickets
+        <a onclick="showSection('voice')" class="nav-item flex items-center gap-3 px-5 py-4 rounded-2xl cursor-pointer hover:bg-gray-900">
+          <i class="fas fa-microphone"></i> Chat de Voz IA
         </a>
-        <a href="#" onclick="showSection('code')" class="nav-item flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-900 text-gray-400 hover:text-white">
-          <i class="fas fa-code w-5"></i> Editor Visual
-        </a>
-        <a href="#" onclick="showSection('settings')" class="nav-item flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-900 text-gray-400 hover:text-white">
-          <i class="fas fa-cog w-5"></i> Configuración
+        <a onclick="showSection('tickets')" class="nav-item flex items-center gap-3 px-5 py-4 rounded-2xl cursor-pointer hover:bg-gray-900">
+          <i class="fas fa-ticket-alt"></i> Tickets
         </a>
       </nav>
 
       <div class="p-4 border-t border-gray-800 text-xs text-gray-500">
-        Servidor propio • IA integrada (Grok-like)
+        Panel de Control Propio
       </div>
     </div>
 
-    <!-- Main Content -->
+    <!-- Contenido -->
     <div class="flex-1 flex flex-col">
-
-      <!-- Top Bar -->
-      <div class="h-16 bg-black border-b border-gray-800 flex items-center justify-between px-8">
-        <div class="flex items-center gap-4">
-          <h2 id="pageTitle" class="text-2xl font-semibold">Dashboard</h2>
-        </div>
-        <div class="flex items-center gap-6">
-          <div class="flex items-center gap-2 bg-gray-900 px-4 py-2 rounded-2xl text-sm">
-            <div class="w-3 h-3 bg-emerald-500 rounded-full animate-pulse"></div>
-            Bot conectado
-          </div>
+      <div class="h-16 bg-black border-b border-gray-800 px-8 flex items-center justify-between">
+        <h2 id="pageTitle" class="text-2xl font-bold">IA Engine</h2>
+        <div class="flex items-center gap-3">
+          <div class="bg-emerald-900 text-emerald-400 px-4 py-1.5 rounded-2xl text-sm">Bot Online</div>
           <button onclick="logout()" class="text-gray-400 hover:text-red-400">
             <i class="fas fa-sign-out-alt"></i>
           </button>
         </div>
       </div>
 
-      <!-- Dashboard Section -->
-      <div id="dashboard" class="section flex-1 p-8 overflow-auto">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div class="bg-gray-900 rounded-3xl p-8">
-            <h3 class="text-lg mb-4">Servidores Conectados</h3>
-            <div class="text-6xl font-bold text-purple-400">12</div>
-            <p class="text-emerald-400 mt-2">+3 esta semana</p>
-          </div>
-          <div class="bg-gray-900 rounded-3xl p-8">
-            <h3 class="text-lg mb-4">Usuarios Activos</h3>
-            <div class="text-6xl font-bold text-blue-400">847</div>
-            <p class="text-emerald-400 mt-2">IA ayudando en tiempo real</p>
-          </div>
-          <div class="bg-gray-900 rounded-3xl p-8">
-            <h3 class="text-lg mb-4">Tickets Abiertos</h3>
-            <div class="text-6xl font-bold text-amber-400">7</div>
-            <button onclick="showSection('tickets')" class="mt-6 text-sm bg-amber-600 hover:bg-amber-700 px-6 py-2 rounded-xl">Gestionar Tickets</button>
-          </div>
-        </div>
-
-        <div class="mt-10">
-          <h3 class="text-xl font-semibold mb-6">Actividad Reciente</h3>
-          <div class="space-y-4">
-            <div class="bg-gray-900 p-5 rounded-2xl flex gap-4">
-              <i class="fas fa-robot text-purple-500 text-2xl"></i>
-              <div>
-                <p><strong>IA Grok</strong> respondió en #general</p>
-                <p class="text-sm text-gray-400">Hace 2 minutos</p>
-              </div>
-            </div>
-          </div>
+      <!-- IA Engine -->
+      <div id="ia-engine" class="section flex-1 p-8">
+        <h3 class="text-xl mb-4">Chat con IA</h3>
+        <div id="chatBox" class="bg-gray-900 h-[480px] rounded-3xl p-6 overflow-auto mb-6"></div>
+        <div class="flex gap-3">
+          <input id="msgInput" class="flex-1 bg-gray-900 border border-gray-700 rounded-3xl px-6 py-4 focus:outline-none" placeholder="Escribe aquí...">
+          <button onclick="sendAIChat()" class="bg-purple-600 px-10 rounded-3xl">Enviar</button>
         </div>
       </div>
 
-      <!-- AI Chat Section -->
-      <div id="ai-chat" class="section hidden flex-1 flex flex-col">
-        <div class="flex-1 p-8 overflow-auto" id="chatMessages">
-          <!-- Mensajes se agregan con JS -->
-        </div>
-        <div class="p-6 border-t border-gray-800">
-          <div class="flex gap-4">
-            <input id="chatInput" type="text" placeholder="Pregúntale a la IA..." 
-                   class="flex-1 bg-gray-900 border border-gray-700 rounded-2xl px-6 py-4 focus:outline-none focus:border-purple-500">
-            <button onclick="sendMessage()" class="bg-purple-600 hover:bg-purple-700 w-14 h-14 rounded-2xl flex items-center justify-center">
-              <i class="fas fa-paper-plane"></i>
-            </button>
-          </div>
-          <p class="text-center text-xs text-gray-500 mt-3">IA integrada (simulada) • Usa tu propio API key en producción</p>
-        </div>
-      </div>
-
-      <!-- Voice Chat Section -->
-      <div id="voice-chat" class="section hidden flex-1 flex flex-col items-center justify-center bg-gradient-to-b from-gray-900 to-black">
-        <div class="text-center">
-          <div id="voiceCircle" onclick="toggleVoice()" 
-               class="w-48 h-48 mx-auto rounded-full border-8 border-purple-500 flex items-center justify-center cursor-pointer hover:scale-105 transition-all">
-            <i id="micIcon" class="fas fa-microphone text-7xl text-purple-400"></i>
-          </div>
-          <h2 class="text-3xl font-bold mt-10">Chat de Voz con IA</h2>
-          <p class="text-gray-400 mt-3">Habla con la IA en tiempo real</p>
-          <div id="voiceStatus" class="mt-8 text-emerald-400 font-medium">Listo para escuchar...</div>
-        </div>
-
-        <div class="mt-16 w-full max-w-lg">
-          <div class="bg-gray-900 rounded-3xl p-6 text-sm terminal" id="voiceTranscript">
-            Transcripción aparecerá aquí...
-          </div>
-        </div>
-      </div>
-
-      <!-- Tickets Section -->
-      <div id="tickets" class="section hidden flex-1 p-8 overflow-auto">
-        <div class="flex justify-between items-center mb-8">
-          <h2 class="text-3xl font-bold">Panel de Tickets</h2>
-          <button onclick="createTicket()" class="bg-emerald-600 hover:bg-emerald-700 px-6 py-3 rounded-2xl flex items-center gap-2">
-            <i class="fas fa-plus"></i> Nuevo Ticket
-          </button>
-        </div>
-        
-        <div class="grid grid-cols-1 gap-4" id="ticketsList">
-          <!-- Tickets generados por JS -->
-        </div>
-      </div>
-
-      <!-- Code Editor Section -->
-      <div id="code" class="section hidden flex-1 flex flex-col">
-        <div class="bg-gray-900 border-b border-gray-800 p-4 flex items-center justify-between">
-          <div class="flex gap-6 text-sm">
-            <button onclick="setLanguage('js')" class="px-4 py-2 rounded-xl hover:bg-gray-800">index.js</button>
-            <button onclick="setLanguage('html')" class="px-4 py-2 rounded-xl hover:bg-gray-800">bot.html</button>
-          </div>
-          <button onclick="runCode()" class="bg-blue-600 hover:bg-blue-700 px-6 py-2 rounded-xl flex items-center gap-2">
-            <i class="fas fa-play"></i> Ejecutar
-          </button>
-        </div>
-        <textarea id="codeEditor" class="flex-1 bg-gray-950 p-6 text-white font-mono text-sm resize-none focus:outline-none" spellcheck="false">
-console.log("¡Hola desde tu bot con IA!");
-        </textarea>
-      </div>
-
-      <!-- Settings -->
-      <div id="settings" class="section hidden flex-1 p-8">
-        <h2 class="text-3xl font-bold mb-8">Configuración del Bot</h2>
-        <div class="max-w-2xl space-y-8">
+      <!-- Personalidad -->
+      <div id="personality" class="section hidden flex-1 p-8">
+        <h3 class="text-2xl mb-8">Configura la Personalidad de tu IA</h3>
+        <div class="max-w-md space-y-6">
           <div>
-            <label class="block text-sm mb-2">Token del Bot</label>
-            <input id="tokenSettings" type="password" class="w-full bg-gray-900 border border-gray-700 rounded-2xl px-5 py-4">
+            <label class="block mb-2 text-sm">Nombre de la IA</label>
+            <input id="aiName" value="Luna" class="w-full bg-gray-900 border border-gray-700 rounded-3xl px-6 py-4">
           </div>
           <div>
-            <label class="block text-sm mb-2">API Key de IA (Groq, OpenAI, etc)</label>
-            <input type="password" placeholder="sk-..." class="w-full bg-gray-900 border border-gray-700 rounded-2xl px-5 py-4">
+            <label class="block mb-2 text-sm">Personalidad / Prompt</label>
+            <textarea id="aiPersonality" rows="8" class="w-full bg-gray-900 border border-gray-700 rounded-3xl p-6">Eres Luna, una IA sarcástica, inteligente y amigable. Ayudas a los usuarios con humor.</textarea>
           </div>
-          <button onclick="saveSettings()" class="bg-white text-black px-8 py-4 rounded-2xl font-semibold">Guardar Configuración</button>
+          <button onclick="savePersonality()" class="w-full bg-white text-black py-4 rounded-3xl font-semibold">Guardar Personalidad</button>
         </div>
       </div>
+
+      <!-- Creador de Comandos -->
+      <div id="commands" class="section hidden flex-1 p-8">
+        <h3 class="text-2xl mb-6">Creador Visual de Comandos (Estilo Scratch)</h3>
+        <div class="grid grid-cols-12 gap-6">
+          <div class="col-span-8 bg-gray-900 rounded-3xl p-8 border border-gray-700">
+            <p class="text-gray-400 mb-4">Área de trabajo - Arrastra los bloques aquí</p>
+            <div id="workspace" class="min-h-[420px] border-2 border-dashed border-gray-600 rounded-2xl p-6"></div>
+          </div>
+          <div class="col-span-4 space-y-4">
+            <div onclick="addBlock('say')" class="block-option bg-purple-600 p-6 rounded-3xl cursor-pointer">💬 Decir mensaje</div>
+            <div onclick="addBlock('ban')" class="block-option bg-red-600 p-6 rounded-3xl cursor-pointer">🚫 Banear</div>
+            <div onclick="addBlock('role')" class="block-option bg-amber-600 p-6 rounded-3xl cursor-pointer">🏷️ Asignar Rol</div>
+            <div onclick="addBlock('embed')" class="block-option bg-blue-600 p-6 rounded-3xl cursor-pointer">📋 Crear Embed</div>
+          </div>
+        </div>
+      </div>
+
     </div>
   </div>
 
   <script>
-    // Tailwind script already included via CDN
+    function fakeDiscordLogin() {
+      document.getElementById('loginScreen').classList.add('hidden');
+      document.getElementById('mainApp').classList.remove('hidden');
+      showSection('ia-engine');
+    }
+
+    function logout() {
+      if (confirm("¿Cerrar sesión de Discord?")) location.reload();
+    }
 
     function showSection(section) {
       document.querySelectorAll('.section').forEach(s => s.classList.add('hidden'));
       document.getElementById(section).classList.remove('hidden');
-      document.getElementById('pageTitle').textContent = 
-        section === 'dashboard' ? 'Dashboard' :
-        section === 'ai-chat' ? 'Chat con IA' :
-        section === 'voice-chat' ? 'Voz IA' :
-        section === 'tickets' ? 'Tickets' :
-        section === 'code' ? 'Editor de Código' : 'Configuración';
       
-      document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active', 'bg-gray-900'));
+      const titles = {
+        'ia-engine': 'IA Engine',
+        'personality': 'Personalidad de la IA',
+        'commands': 'Creador de Comandos',
+        'voice': 'Chat de Voz IA',
+        'tickets': 'Panel de Tickets'
+      };
+      document.getElementById('pageTitle').textContent = titles[section] || 'NeoBot Studio';
     }
 
-    // AI Chat
-    function addMessage(text, isUser = false) {
-      const container = document.getElementById('chatMessages');
-      const msg = document.createElement('div');
-      msg.className = `flex ${isUser ? 'justify-end' : 'justify-start'} mb-6`;
-      msg.innerHTML = `
-        <div class="${isUser ? 'bg-purple-600' : 'bg-gray-800'} chat-bubble px-6 py-4 rounded-3xl">
-          ${text}
-        </div>
-      `;
-      container.appendChild(msg);
-      container.scrollTop = container.scrollHeight;
-    }
-
-    function sendMessage() {
-      const input = document.getElementById('chatInput');
+    function sendAIChat() {
+      const input = document.getElementById('msgInput');
       if (!input.value.trim()) return;
       
-      addMessage(input.value, true);
+      const box = document.getElementById('chatBox');
+      box.innerHTML += `<p class="text-right mb-3"><span class="bg-purple-600 px-5 py-3 rounded-3xl inline-block">Tú: ${input.value}</span></p>`;
       
-      // Simulación de respuesta IA
       setTimeout(() => {
-        const responses = [
-          "¡Entendido! ¿En qué más puedo ayudarte con tu servidor?",
-          "Como IA integrada, puedo ayudarte a moderar, responder preguntas y mucho más.",
-          "¡Claro! He registrado tu solicitud en el sistema."
-        ];
-        addMessage(responses[Math.floor(Math.random() * responses.length)]);
+        box.innerHTML += `<p class="mb-3"><span class="bg-gray-800 px-5 py-3 rounded-3xl inline-block">Luna: ¡Perfecto! ¿Algo más?</span></p>`;
+        box.scrollTop = box.scrollHeight;
       }, 800);
       
       input.value = '';
     }
 
-    // Voice Chat (simulado)
-    let isListening = false;
-    function toggleVoice() {
-      isListening = !isListening;
-      const circle = document.getElementById('voiceCircle');
-      const icon = document.getElementById('micIcon');
-      const status = document.getElementById('voiceStatus');
+    function savePersonality() {
+      alert("✅ Personalidad guardada correctamente. La IA usará esta configuración.");
+    }
+
+    function addBlock(type) {
+      const workspace = document.getElementById('workspace');
+      let html = '';
       
-      if (isListening) {
-        circle.classList.add('animate-pulse', 'border-red-500');
-        icon.classList.remove('fa-microphone');
-        icon.classList.add('fa-microphone-slash');
-        status.textContent = 'Escuchando... (simulación)';
-        simulateVoiceInput();
-      } else {
-        circle.classList.remove('animate-pulse', 'border-red-500');
-        icon.classList.add('fa-microphone');
-        icon.classList.remove('fa-microphone-slash');
-        status.textContent = 'Listo para escuchar...';
+      switch(type) {
+        case 'say':
+          html = `<div class="bg-purple-600 text-white p-5 rounded-2xl mb-4 inline-block">Decir: <input class="bg-transparent border-b w-48 outline-none ml-2"></div>`;
+          break;
+        case 'ban':
+          html = `<div class="bg-red-600 text-white p-5 rounded-2xl mb-4 inline-block">Banear usuario</div>`;
+          break;
+        case 'role':
+          html = `<div class="bg-amber-600 text-white p-5 rounded-2xl mb-4 inline-block">Asignar rol</div>`;
+          break;
+        case 'embed':
+          html = `<div class="bg-blue-600 text-white p-5 rounded-2xl mb-4 inline-block">Crear Embed</div>`;
+          break;
       }
+      workspace.innerHTML += html;
     }
-
-    function simulateVoiceInput() {
-      setTimeout(() => {
-        if (!isListening) return;
-        const transcript = document.getElementById('voiceTranscript');
-        const phrases = [
-          "Hola, ¿cómo configuro roles automáticos?",
-          "Quiero que la IA responda en los canales de soporte",
-          "Crea un ticket para mí"
-        ];
-        transcript.textContent = phrases[Math.floor(Math.random() * phrases.length)];
-        
-        setTimeout(() => {
-          if (isListening) toggleVoice();
-        }, 2500);
-      }, 1800);
-    }
-
-    // Tickets
-    function createTicket() {
-      const list = document.getElementById('ticketsList');
-      const ticket = document.createElement('div');
-      ticket.className = "bg-gray-900 rounded-3xl p-6 flex items-start gap-6";
-      ticket.innerHTML = `
-        <div class="w-10 h-10 bg-amber-500 text-black rounded-2xl flex items-center justify-center font-bold">T#${Math.floor(1000 + Math.random() * 9000)}</div>
-        <div class="flex-1">
-          <div class="flex justify-between">
-            <h4 class="font-semibold">Problema con permisos en canal</h4>
-            <span class="text-xs bg-amber-600 px-3 py-1 rounded-full">Abierto</span>
-          </div>
-          <p class="text-gray-400 text-sm mt-1">Usuario @darklord • Hace 12 minutos</p>
-          <button onclick="this.parentElement.parentElement.remove()" class="mt-4 text-red-400 text-sm hover:text-red-500">Cerrar Ticket</button>
-        </div>
-      `;
-      list.appendChild(ticket);
-    }
-
-    // Connect Bot
-    function connectBot() {
-      const token = document.getElementById('botToken').value;
-      if (token.length > 10) {
-        alert("✅ Bot conectado correctamente (simulación)\n\nEn producción se conectaría a Discord vía WebSocket.");
-      } else {
-        alert("Por favor ingresa un token válido");
-      }
-    }
-
-    function saveSettings() {
-      alert("Configuración guardada correctamente");
-    }
-
-    function logout() {
-      if (confirm("¿Cerrar sesión?")) location.reload();
-    }
-
-    function setLanguage(lang) {
-      const editor = document.getElementById('codeEditor');
-      if (lang === 'js') {
-        editor.value = `// Tu bot con IA\nclient.on('messageCreate', async message => {\n  if (message.content.startsWith('!ia')) {\n    // Llamada a API de IA\n  }\n});`;
-      } else {
-        editor.value = `<h1>Panel de control del bot</h1>`;
-      }
-    }
-
-    function runCode() {
-      alert("Código ejecutado en el servidor (simulación). Revisa la consola del bot.");
-    }
-
-    // Inicialización
-    window.onload = () => {
-      showSection('dashboard');
-      
-      // Mensaje de bienvenida en chat IA
-      setTimeout(() => {
-        if (!document.getElementById('ai-chat').classList.contains('hidden')) {
-          addMessage("¡Hola! Soy la IA integrada en tu servidor. ¿Qué deseas hacer hoy?");
-        }
-      }, 1200);
-
-      // Crear algunos tickets iniciales
-      setTimeout(() => {
-        createTicket();
-        createTicket();
-      }, 500);
-    };
-
-    // Atajo de teclado para enviar mensaje
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' && document.getElementById('ai-chat').style.display !== 'none') {
-        sendMessage();
-      }
-    });
   </script>
 </body>
 </html>
