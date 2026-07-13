@@ -3,151 +3,180 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>NeoBot Studio - Bot con IA + Imágenes</title>
+  <title>NeoBot Studio</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
-  <style>
-    body { font-family: 'Segoe UI', system-ui, sans-serif; }
-    .section { display: none; }
-  </style>
 </head>
 <body class="bg-gray-950 text-gray-100">
 
   <!-- Welcome + Discord Login -->
-  <div id="welcomeScreen" class="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-950 to-black">
-    <div class="text-center max-w-md">
-      <h1 class="text-6xl font-bold mb-3">NeoBot Studio</h1>
-      <p class="text-xl text-purple-300 mb-10">Tu bot de Discord con IA + Generación de Imágenes</p>
-      <button onclick="startOnboarding()" class="w-full bg-[#5865F2] py-5 rounded-3xl text-xl font-semibold flex items-center justify-center gap-4">
-        <i class="fab fa-discord text-3xl"></i> Iniciar con Discord
+  <div id="welcome" class="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-950 to-black">
+    <div class="text-center">
+      <h1 class="text-6xl font-bold mb-4">NeoBot Studio</h1>
+      <p class="text-2xl text-purple-300 mb-10">Tu Bot con IA + Generación de Imágenes</p>
+      <button onclick="discordLogin()" class="bg-[#5865F2] hover:bg-[#4752C4] px-10 py-5 rounded-3xl text-xl font-semibold flex items-center gap-4 mx-auto">
+        <i class="fab fa-discord text-3xl"></i> Iniciar sesión con Discord
       </button>
     </div>
   </div>
 
-  <!-- Onboarding -->
+  <!-- Onboarding / Tutorial -->
   <div id="onboarding" class="hidden min-h-screen bg-gray-950 py-12">
-    <div class="max-w-2xl mx-auto px-6">
-      <h2 class="text-4xl font-bold text-center mb-10">Configura tu Bot</h2>
+    <div class="max-w-3xl mx-auto px-8">
+      <h2 class="text-4xl font-bold text-center mb-12">Cómo Crear tu Bot (Paso a Paso)</h2>
       
       <div class="space-y-10">
-        <!-- Pasos -->
-        <div class="flex gap-6">
-          <div class="shrink-0 w-10 h-10 bg-purple-600 rounded-2xl flex items-center justify-center font-bold">1</div>
-          <div><strong>Ve al Discord Developer Portal</strong><br><a href="https://discord.com/developers/applications" target="_blank" class="text-blue-400">discord.com/developers</a></div>
+        <div class="flex gap-8 items-start">
+          <div class="w-12 h-12 bg-purple-600 rounded-2xl flex items-center justify-center text-2xl font-bold shrink-0">1</div>
+          <div>
+            <h3 class="text-xl font-semibold">1. Ve al Portal de Desarrolladores</h3>
+            <a href="https://discord.com/developers/applications" target="_blank" class="text-blue-400 underline">discord.com/developers/applications</a>
+          </div>
         </div>
-        <div class="flex gap-6">
-          <div class="shrink-0 w-10 h-10 bg-purple-600 rounded-2xl flex items-center justify-center font-bold">2</div>
-          <div><strong>Crea Nueva Aplicación → Bot → Copia el Token</strong></div>
+        <div class="flex gap-8 items-start">
+          <div class="w-12 h-12 bg-purple-600 rounded-2xl flex items-center justify-center text-2xl font-bold shrink-0">2</div>
+          <div><h3 class="text-xl font-semibold">2. New Application → Agrega un Bot</h3></div>
+        </div>
+        <div class="flex gap-8 items-start">
+          <div class="w-12 h-12 bg-purple-600 rounded-2xl flex items-center justify-center text-2xl font-bold shrink-0">3</div>
+          <div><h3 class="text-xl font-semibold">3. Copia el Token (Reset Token)</h3></div>
         </div>
       </div>
 
-      <div class="mt-12 bg-gray-900 rounded-3xl p-8">
-        <input id="botToken" type="password" placeholder="Pega aquí tu Token de Discord" class="w-full bg-black border border-gray-700 rounded-2xl px-6 py-5">
-        <button onclick="connectBot()" class="mt-6 w-full bg-emerald-600 py-5 rounded-3xl text-lg font-semibold">Conectar Bot → Entrar al Panel</button>
+      <div class="mt-16 bg-gray-900 rounded-3xl p-10">
+        <p class="mb-4 text-gray-400">Pega tu Token aquí:</p>
+        <input id="tokenInput" type="password" class="w-full bg-black border border-gray-700 rounded-2xl px-6 py-5 text-lg" placeholder="MTA...">
+        <button onclick="connectBot()" class="mt-6 w-full bg-emerald-600 py-5 rounded-3xl text-xl font-semibold">Conectar y Entrar al Panel</button>
       </div>
     </div>
   </div>
 
-  <!-- MAIN PANEL -->
-  <div id="mainPanel" class="hidden flex h-screen">
+  <!-- PANEL PRINCIPAL -->
+  <div id="panel" class="hidden flex h-screen">
 
     <!-- Sidebar -->
-    <div class="w-72 bg-black border-r border-gray-800 p-6 flex flex-col">
-      <h1 class="text-3xl font-bold mb-8">NeoBot</h1>
-      <nav class="flex-1 space-y-2">
-        <button onclick="showSection('ia-engine')" class="w-full text-left px-5 py-4 rounded-2xl hover:bg-gray-900 flex items-center gap-3">🤖 IA Engine</button>
-        <button onclick="showSection('personality')" class="w-full text-left px-5 py-4 rounded-2xl hover:bg-gray-900 flex items-center gap-3">👤 Personalidad</button>
-        <button onclick="showSection('commands')" class="w-full text-left px-5 py-4 rounded-2xl hover:bg-gray-900 flex items-center gap-3">🧩 Creador de Comandos</button>
-      </nav>
+    <div class="w-72 bg-black border-r border-gray-800 flex flex-col">
+      <div class="p-6 border-b border-gray-800">
+        <h1 class="text-3xl font-bold">NeoBot Studio</h1>
+      </div>
+      
+      <div class="flex-1 p-4 space-y-2">
+        <button onclick="showSection('ia')" class="w-full text-left px-5 py-4 rounded-2xl hover:bg-gray-900 flex items-center gap-3 text-lg">🤖 IA Engine</button>
+        <button onclick="showSection('personality')" class="w-full text-left px-5 py-4 rounded-2xl hover:bg-gray-900 flex items-center gap-3 text-lg">👤 Personalidad</button>
+        <button onclick="showSection('commands')" class="w-full text-left px-5 py-4 rounded-2xl hover:bg-gray-900 flex items-center gap-3 text-lg">🧩 Creador Visual</button>
+      </div>
     </div>
 
-    <!-- IA Engine (Chat + Imágenes) -->
-    <div id="ia-engine" class="section flex-1 p-8 overflow-auto">
-      <h2 class="text-3xl font-bold mb-8">IA Engine</h2>
-      
-      <div class="grid grid-cols-2 gap-8">
-        <!-- Chat -->
-        <div>
-          <h3 class="text-xl mb-4">Chat con IA</h3>
-          <div id="chatMessages" class="bg-gray-900 h-96 rounded-3xl p-6 overflow-auto mb-4"></div>
-          <div class="flex gap-3">
-            <input id="chatInput" class="flex-1 bg-gray-900 rounded-3xl px-6 py-4" placeholder="Escribe un mensaje...">
-            <button onclick="sendChatMessage()" class="bg-purple-600 px-8 rounded-3xl">Enviar</button>
+    <!-- Contenido -->
+    <div class="flex-1 overflow-auto">
+
+      <!-- IA ENGINE -->
+      <div id="ia" class="section p-10">
+        <h2 class="text-3xl font-bold mb-8">IA Engine</h2>
+        
+        <div class="flex gap-6 mb-6">
+          <div class="flex-1">
+            <label class="block text-sm mb-2">Modelo de IA</label>
+            <select class="bg-gray-900 border border-gray-700 rounded-2xl px-6 py-4 w-full">
+              <option>Grok (Recomendado)</option>
+              <option>GPT-4o</option>
+              <option>Claude 3</option>
+            </select>
+          </div>
+          <div class="flex-1">
+            <label class="block text-sm mb-2">Estado</label>
+            <button class="bg-emerald-600 px-8 py-4 rounded-2xl w-full">Activo</button>
           </div>
         </div>
 
-        <!-- Generador de Imágenes -->
-        <div>
-          <h3 class="text-xl mb-4">Generador de Imágenes</h3>
+        <div class="grid grid-cols-2 gap-8">
+          <!-- Chat -->
           <div class="bg-gray-900 rounded-3xl p-6">
-            <input id="imagePrompt" class="w-full bg-gray-800 rounded-2xl px-6 py-4 mb-4" placeholder="Describe la imagen que quieres crear...">
-            <button onclick="generateImage()" class="w-full bg-gradient-to-r from-pink-500 to-purple-600 py-4 rounded-2xl font-semibold">Generar Imagen</button>
-            
-            <div id="imageResult" class="mt-6 hidden">
-              <img id="generatedImage" class="w-full rounded-3xl" alt="Imagen generada">
-              <button onclick="downloadImage()" class="mt-4 text-sm underline">Descargar Imagen</button>
+            <h3 class="font-semibold mb-4">Chat con IA</h3>
+            <div id="chatArea" class="h-80 overflow-auto mb-4"></div>
+            <div class="flex">
+              <input id="chatMsg" class="flex-1 bg-gray-800 rounded-l-3xl px-6 py-4" placeholder="Escribe...">
+              <button onclick="sendMsg()" class="bg-purple-600 px-8 rounded-r-3xl">Enviar</button>
+            </div>
+          </div>
+
+          <!-- Generador de Imágenes -->
+          <div class="bg-gray-900 rounded-3xl p-6">
+            <h3 class="font-semibold mb-4">Generar Imágenes</h3>
+            <input id="imgPrompt" class="w-full bg-gray-800 rounded-2xl px-6 py-4 mb-4" placeholder="Describe la imagen...">
+            <button onclick="generateImg()" class="w-full bg-gradient-to-r from-pink-500 to-violet-600 py-4 rounded-2xl font-semibold">Generar Imagen</button>
+            <div id="imgContainer" class="mt-6 hidden text-center">
+              <img id="generatedImg" class="rounded-3xl mx-auto max-h-80" alt="">
             </div>
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- Otras secciones -->
-    <div id="personality" class="section hidden flex-1 p-8">...</div>
-    <div id="commands" class="section hidden flex-1 p-8">...</div>
+      <!-- PERSONALIDAD -->
+      <div id="personality" class="section hidden p-10">
+        <h2 class="text-3xl font-bold mb-8">Personalidad de la IA</h2>
+        <div class="max-w-xl">
+          <input id="aiName" value="Luna" class="w-full bg-gray-900 rounded-2xl px-6 py-5 mb-6">
+          <textarea id="aiPrompt" class="w-full h-64 bg-gray-900 rounded-3xl p-6">Eres una IA divertida, útil y un poco sarcástica.</textarea>
+          <button onclick="savePersonality()" class="mt-6 bg-white text-black px-10 py-4 rounded-2xl">Guardar Personalidad</button>
+        </div>
+      </div>
+
+      <!-- CREADOR VISUAL -->
+      <div id="commands" class="section hidden p-10">
+        <h2 class="text-3xl font-bold mb-8">Creador Visual de Comandos</h2>
+        <div class="bg-gray-900 rounded-3xl p-8 min-h-[500px]">
+          <p class="text-gray-400">Arrastra bloques aquí (simulación)</p>
+          <button onclick="addCommandBlock()" class="mt-10 bg-purple-600 px-8 py-4 rounded-2xl">+ Agregar Bloque</button>
+        </div>
+      </div>
+    </div>
   </div>
 
   <script>
-    function startOnboarding() {
-      document.getElementById('welcomeScreen').classList.add('hidden');
+    function discordLogin() {
+      document.getElementById('welcome').classList.add('hidden');
       document.getElementById('onboarding').classList.remove('hidden');
     }
 
     function connectBot() {
-      const token = document.getElementById('botToken').value.trim();
-      if (!token) return alert("Ingresa tu token");
+      const token = document.getElementById('tokenInput').value;
+      if (token.length < 20) return alert("Token inválido");
       
       document.getElementById('onboarding').classList.add('hidden');
-      document.getElementById('mainPanel').classList.remove('hidden');
-      showSection('ia-engine');
+      document.getElementById('panel').classList.remove('hidden');
+      showSection('ia');
     }
 
-    function showSection(id) {
+    function showSection(section) {
       document.querySelectorAll('.section').forEach(s => s.classList.add('hidden'));
-      document.getElementById(id).classList.remove('hidden');
+      document.getElementById(section).classList.remove('hidden');
     }
 
-    // Chat
-    function sendChatMessage() {
-      const input = document.getElementById('chatInput');
-      const messages = document.getElementById('chatMessages');
+    function sendMsg() {
+      const input = document.getElementById('chatMsg');
+      const area = document.getElementById('chatArea');
       if (!input.value) return;
-
-      messages.innerHTML += `<div class="text-right mb-4"><span class="bg-purple-600 px-5 py-3 rounded-3xl">${input.value}</span></div>`;
-      
-      setTimeout(() => {
-        messages.innerHTML += `<div class="mb-4"><span class="bg-gray-800 px-5 py-3 rounded-3xl">¡Claro! ¿Quieres que genere una imagen también?</span></div>`;
-        messages.scrollTop = messages.scrollHeight;
-      }, 700);
+      area.innerHTML += `<div class="text-right mb-3"><span class="bg-purple-600 px-5 py-3 rounded-3xl">${input.value}</span></div>`;
       input.value = '';
     }
 
-    // Generación de Imágenes (Simulada)
-    function generateImage() {
-      const prompt = document.getElementById('imagePrompt').value.trim();
-      if (!prompt) return alert("Describe la imagen");
-
-      const resultDiv = document.getElementById('imageResult');
-      const img = document.getElementById('generatedImage');
-
-      resultDiv.classList.remove('hidden');
-      img.src = `https://picsum.photos/seed/${prompt.length}/800/600`; // Imagen aleatoria simulada
-
-      alert("Imagen generada (simulación)\n\nEn producción usaría Grok Imagine, Flux, Midjourney, etc.");
+    function generateImg() {
+      const prompt = document.getElementById('imgPrompt').value;
+      if (!prompt) return alert("Escribe una descripción");
+      
+      const container = document.getElementById('imgContainer');
+      const img = document.getElementById('generatedImg');
+      container.classList.remove('hidden');
+      img.src = `https://picsum.photos/id/${Math.floor(Math.random()*100)}/800/600`;
     }
 
-    function downloadImage() {
-      alert("Imagen descargada (simulación)");
+    function savePersonality() {
+      alert("✅ Personalidad guardada");
+    }
+
+    function addCommandBlock() {
+      alert("Bloque añadido (simulación de creador visual)");
     }
   </script>
 </body>
